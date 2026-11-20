@@ -13,28 +13,53 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from backend.database.models import Base
 
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
 # ---------------------------------------------------------------------------
 # Engine & session factory
 # ---------------------------------------------------------------------------
-def _normalize_db_url(url: str) -> str:
+def _normalize_db_url_and_args(raw_url: str) -> tuple[str, dict]:
     """Normalize PostgreSQL / Neon connection strings for asyncpg."""
+    url = raw_url
+    connect_args = {}
+
     if url.startswith("postgres://"):
         url = "postgresql+asyncpg://" + url[len("postgres://"):]
     elif url.startswith("postgresql://") and not url.startswith("postgresql+"):
         url = "postgresql+asyncpg://" + url[len("postgresql://"):]
-    return url
+
+    # asyncpg expects connect_args={'ssl': 'require'}, NOT query parameter sslmode='require'
+    if "sslmode=" in url or "neon.tech" in url:
+        parsed = urlparse(url)
+        query_params = parse_qs(parsed.query)
+        # Pop sslmode so asyncpg doesn't reject it as unexpected kwarg
+        ssl_val = query_params.pop("sslmode", ["require"])[0]
+        new_query = urlencode(query_params, doseq=True)
+        url = urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.params,
+            new_query,
+            parsed.fragment
+        ))
+        if ssl_val in ("require", "verify-ca", "verify-full") or "neon.tech" in url:
+            connect_args["ssl"] = "require"
+
+    if "sqlite" in url:
+        connect_args["check_same_thread"] = False
+
+    return url, connect_args
+
 
 DATABASE_URL = "sqlite+aiosqlite:///./newsletter.db"
+connect_args = {"check_same_thread": False}
 
 try:
     from backend.config.settings import settings
-    DATABASE_URL = _normalize_db_url(settings.database_url)
+    DATABASE_URL, connect_args = _normalize_db_url_and_args(settings.database_url)
 except Exception:
     pass
-
-connect_args = {}
-if "sqlite" in DATABASE_URL:
-    connect_args["check_same_thread"] = False
 
 async_engine = create_async_engine(
     DATABASE_URL,
