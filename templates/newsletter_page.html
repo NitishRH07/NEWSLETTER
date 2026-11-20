@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAL AI Tools Weekly Newsletter</title>
+<style>
+  /* =====================================================================
+     RESET & BASE
+     ===================================================================== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:       #003087;
+    --navy-dark:  #002060;
+    --navy-light: #e8eef8;
+    --red:        #CC0000;
+    --red-line:   #d32f2f;
+    --white:      #FFFFFF;
+    --grey-text:  #333333;
+    --grey-sub:   #555555;
+    --border:     #003087;
+  }
+
+  body {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 9.5pt;
+    color: var(--grey-text);
+    background: #eef2f7;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* =====================================================================
+     A4 PAGE SPECIFICATION (210mm x 297mm)
+     ===================================================================== */
+  @page {
+    size: 210mm 297mm;
+    margin: 0;
+  }
+
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    max-height: 297mm;
+    overflow: hidden;
+    padding: 12mm 14mm 10mm 14mm;
+    margin: 0 auto;
+    page-break-after: always;
+    page-break-inside: avoid;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  @media print {
+    body { background: transparent; }
+    .page {
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+    }
+  }
+
+  /* =====================================================================
+     WATERMARK — Fighter Jet Silhouette (Faint, Angled)
+     ===================================================================== */
+  .watermark-container {
+    position: absolute;
+    top: 50%;
+    left: 55%;
+    transform: translate(-50%, -50%) rotate(-32deg);
+    width: 170mm;
+    height: 170mm;
+    opacity: 0.038;
+    pointer-events: none;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .watermark-container svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* =====================================================================
+     HEADER ROW
+     ===================================================================== */
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4mm;
+    z-index: 1;
+    position: relative;
+  }
+
+  .logo-placeholder-box {
+    width: 46mm;
+    height: 22mm;
+    border: 1.5px dashed var(--navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--navy);
+    background: transparent;
+    padding: 2mm;
+    border-radius: 2px;
+  }
+
+  .logo-placeholder-box .logo-text-main {
+    font-size: 8.5pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.25;
+  }
+
+  .logo-placeholder-box .logo-text-sub {
+    font-size: 6.8pt;
+    font-weight: normal;
+    color: #444;
+    margin-top: 2px;
+  }
+
+  .issue-info {
+    text-align: right;
+    color: var(--navy);
+    font-size: 9pt;
+    line-height: 1.7;
+    font-weight: 500;
+  }
+
+  .issue-info .info-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .issue-info .info-label {
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .issue-info .info-val {
+    font-weight: 700;
+    color: #111;
+    min-width: 28mm;
+    text-align: left;
+    border-bottom: 1px solid #aaa;
+    padding-left: 2px;
+  }
+
+  /* =====================================================================
+     TITLE AREA
+     ===================================================================== */
+  .title-area {
+    z-index: 1;
+    position: relative;
+    margin-bottom: 3.5mm;
+  }
+
+  .tool-name-row {
+    display: flex;
+    align-items: center;
+    gap: 2.5mm;
+    margin-bottom: 1.5mm;
+  }
+
+  .tool-name-label {
+    font-size: 19pt;
+    font-weight: 900;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+
+  .tool-name-val {
+    font-size: 19pt;
+    font-weight: 900;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+    border-bottom: 2.5px solid var(--navy);
+    padding-bottom: 1px;
+    padding-right: 4mm;
+  }
+
+  .title-accent-bar {
+    flex: 1;
+    max-width: 25mm;
+    height: 3.5px;
+    background: var(--navy);
+    border-radius: 2px;
+    margin-left: 2mm;
+  }
+
+  .category-row {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+  }
+
+  .category-label {
+    font-size: 11pt;
+    font-weight: 800;
+    color: var(--red);
+  }
+
+  .category-val {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: var(--red);
+    border-bottom: 1px solid var(--red);
+    padding-bottom: 1px;
+  }
+
+  .pricing-badge {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1.5px 7px;
+    border-radius: 3px;
+    margin-left: 4mm;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* =====================================================================
+     SECTIONS LIST
+     ===================================================================== */
+  .sections {
+    flex: 1;
+    z-index: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .section-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 3.5mm;
+    padding-bottom: 2.2mm;
+    border-bottom: 1px solid var(--red-line);
+  }
+
+  .section-icon-circle {
+    flex-shrink: 0;
+    width: 8.5mm;
+    height: 8.5mm;
+    border: 1.8px solid var(--navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5pt;
+    color: var(--navy);
+    background: #ffffff;
+    margin-top: 1px;
+  }
+
+  .section-content {
+    flex: 1;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5mm;
+    margin-bottom: 1mm;
+  }
+
+  .section-title {
+    font-size: 9.5pt;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: 0.2px;
+  }
+
+  .section-text {
+    font-size: 8.3pt;
+    color: #2b2b2b;
+    line-height: 1.42;
+  }
+
+  .section-text ul {
+    margin: 0;
+    padding-left: 4mm;
+    list-style: disc;
+  }
+
+  .section-text ul li {
+    margin-bottom: 0.8mm;
+    line-height: 1.38;
+  }
+
+  /* =====================================================================
+     BOTTOM ROW — Sample Prompt + QR Website Box
+     ===================================================================== */
+  .bottom-row {
+    display: flex;
+    gap: 3.5mm;
+    margin-top: 2.5mm;
+    z-index: 1;
+    position: relative;
+    min-height: 28mm;
+  }
+
+  .sample-prompt-box {
+    flex: 58;
+    border: 1.5px solid var(--navy);
+    border-radius: 6px;
+    padding: 3mm 3.5mm;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .sample-prompt-header {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    margin-bottom: 1.5mm;
+  }
+
+  .prompt-icon-bubble {
+    font-size: 11pt;
+    color: var(--navy);
+  }
+
+  .prompt-heading {
+    font-size: 9pt;
+    font-weight: 800;
+    color: var(--navy);
+  }
+
+  .prompt-body {
+    font-size: 7.9pt;
+    color: #333333;
+    font-style: italic;
+    line-height: 1.38;
+    padding-left: 1mm;
+  }
+
+  .qr-website-box {
+    flex: 42;
+    border: 1.5px solid var(--navy);
+    border-radius: 6px;
+    padding: 2.5mm 3mm;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+
+  .qr-code-side {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qr-code-side img {
+    display: block;
+    width: 20mm;
+    height: 20mm;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+  }
+
+  .website-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1mm;
+  }
+
+  .website-instruction {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5mm;
+    font-size: 7pt;
+    color: #444;
+    line-height: 1.25;
+  }
+
+  .globe-symbol {
+    font-size: 9pt;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+
+  .website-link {
+    font-size: 8.5pt;
+    font-weight: 800;
+    color: var(--navy);
+    word-break: break-all;
+    text-decoration: none;
+    margin-top: 1px;
+  }
+
+  .website-link a {
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  .website-pricing-note {
+    font-size: 6.8pt;
+    color: #666;
+  }
+
+  /* =====================================================================
+     FOOTER
+     ===================================================================== */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2.5mm;
+    padding-top: 2mm;
+    border-top: 1.5px solid var(--navy);
+    z-index: 1;
+    position: relative;
+  }
+
+  .footer-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 2mm;
+    max-width: 78%;
+  }
+
+  .footer-shield-icon {
+    font-size: 9.5pt;
+    color: var(--navy);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .footer-security-text {
+    font-size: 6.8pt;
+    color: #333;
+    line-height: 1.35;
+  }
+
+  .footer-security-text .sec-title {
+    font-weight: 800;
+    color: var(--navy);
+  }
+
+  .footer-security-text .sec-caution {
+    color: #555;
+  }
+
+  .footer-right {
+    font-size: 8.5pt;
+    color: var(--navy);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+{% for tool in tools %}
+<div class="page">
+
+  <!-- ================================================================
+       WATERMARK: Top-down Fighter Jet Silhouette (Hal Tejas style)
+       Angled diagonally at -32deg, faint opacity
+       ================================================================ -->
+  <div class="watermark-container" aria-hidden="true">
+    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+      <g fill="#003087">
+        <!-- Main Fuselage -->
+        <path d="M 300,50 
+                 C 305,100 312,180 314,240 
+                 C 316,300 318,380 318,480 
+                 C 318,510 305,530 300,540 
+                 C 295,530 282,510 282,480 
+                 C 282,380 284,300 286,240 
+                 C 288,180 295,100 300,50 Z"/>
+        <!-- Needle nose -->
+        <polygon points="300,30 297,55 303,55"/>
+        <!-- Cockpit Glass Canopy -->
+        <path d="M 296,130 C 294,155 294,195 296,215 C 298,220 302,220 304,215 C 306,195 306,155 304,130 C 302,125 298,125 296,130 Z" fill="#ffffff" opacity="0.4"/>
+        <!-- Compound Delta Wings (LCA Tejas style) -->
+        <path d="M 290,230 L 130,420 L 130,440 L 285,420 Z"/>
+        <path d="M 310,230 L 470,420 L 470,440 L 315,420 Z"/>
+        <!-- Wingtip Missile Rails / Pods -->
+        <rect x="126" y="400" width="5" height="42" rx="2"/>
+        <rect x="469" y="400" width="5" height="42" rx="2"/>
+        <!-- Vertical Stabilizer Fin -->
+        <polygon points="297,420 303,420 302,520 298,520"/>
+        <!-- Engine Nozzle / Exhaust -->
+        <path d="M 292,535 L 308,535 L 305,550 L 295,550 Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ================================================================
+       HEADER: HAL Logo Placeholder (Left) & Issue Metadata (Right)
+       ================================================================ -->
+  <div class="header-row">
+    {% if hal_logo_b64 %}
+    <div class="logo-official-box" style="width: 48mm; height: 22mm; display: flex; align-items: center;">
+      <img src="{{ hal_logo_b64 }}" alt="HAL Logo" style="max-width: 46mm; max-height: 20mm; object-fit: contain;">
+    </div>
+    {% else %}
+    <div class="logo-placeholder-box">
+      <div class="logo-text-main">HAL LOGO<br>PLACEHOLDER</div>
+      <div class="logo-text-sub">(Do not alter)</div>
+    </div>
+    {% endif %}
+    <div class="issue-info">
+      <div class="info-row">
+        <span class="info-label">Issue:</span>
+        <span class="info-val">{{ '%02d' % issue_number }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Week:</span>
+        <span class="info-val">{{ week_label }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Date:</span>
+        <span class="info-val">{{ pub_date }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       TITLE AREA: Tool Name with Navy Bar & Category in Red
+       ================================================================ -->
+  <div class="title-area">
+    <div class="tool-name-row">
+      <span class="tool-name-label">Tool Name:</span>
+      <span class="tool-name-val">{{ tool.name }}</span>
+      <span class="title-accent-bar"></span>
+    </div>
+    <div class="category-row">
+      <span class="category-label">Category:</span>
+      <span class="category-val">{{ tool.category }}</span>
+      {% if tool.pricing_tier %}
+      <span class="pricing-badge">{{ tool.pricing_tier }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ================================================================
+       SECTIONS: 5 Core Sections with Circular Icons & Red Bottom Dividers
+       ================================================================ -->
+  <div class="sections">
+
+    <!-- 1. Overview -->
+    <div class="section-item">
+      <div class="section-icon-circle">📄</div>
+      <div class="section-content">
+        <div class="section-header">
+          <span class="section-title">Overview:</span>
+        </div>
+        <div class="section-text">{{ tool.overview }}</div>
+      </div>
+    </div>
+
+    <!-- 2. Key Features -->
+    <div class="section-item">
+      <div class="section-icon-circle">⭐</div>
+      <div class="section-content">
+        <div class="section-header">
+          <span class="section-title">Key Features:</span>
+        </div>
+        <div class="section-text">
+          <ul>
+            {% for feature in tool.key_features %}
+            <li>{{ feature }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. How It Works -->
+    <div class="section-item">
+      <div class="section-icon-circle">⚙️</div>
+      <div class="section-content">
+        <div class="section-header">
+          <span class="section-title">How It Works:</span>
+        </div>
+        <div class="section-text">{{ tool.how_it_works }}</div>
+      </div>
+    </div>
+
+    <!-- 4. Practical Applications -->
+    <div class="section-item">
+      <div class="section-icon-circle">💼</div>
+      <div class="section-content">
+        <div class="section-header">
+          <span class="section-title">Practical Applications:</span>
+        </div>
+        <div class="section-text">{{ tool.practical_applications }}</div>
+      </div>
+    </div>
+
+    <!-- 5. Potential HAL Use Case -->
+    <div class="section-item">
+      <div class="section-icon-circle">👥</div>
+      <div class="section-content">
+        <div class="section-header">
+          <span class="section-title">Potential HAL Use Case:</span>
+        </div>
+        <div class="section-text">{{ tool.hal_use_case }}</div>
+      </div>
+    </div>
+
+  </div><!-- /sections -->
+
+  <!-- ================================================================
+       BOTTOM ROW: Sample Prompt (Left) + QR Website Box (Right)
+       ================================================================ -->
+  <div class="bottom-row">
+
+    <div class="sample-prompt-box">
+      <div class="sample-prompt-header">
+        <span class="prompt-icon-bubble">💬</span>
+        <span class="prompt-heading">Sample Prompt:</span>
+      </div>
+      <div class="prompt-body">"{{ tool.sample_prompt }}"</div>
+    </div>
+
+    <div class="qr-website-box">
+      <div class="qr-code-side">
+        <img src="{{ tool.qr_code_b64 }}" alt="QR Code for {{ tool.name }}">
+      </div>
+      <div class="website-side">
+        <div class="website-instruction">
+          <span class="globe-symbol">🌐</span>
+          <span>Scan for more details<br>or visit our official website:</span>
+        </div>
+        <div class="website-link">
+          <a href="{{ tool.website }}" target="_blank">{{ tool.website_display | default(tool.website) }}</a>
+        </div>
+        {% if tool.pricing_details %}
+        <div class="website-pricing-note">{{ tool.pricing_details }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div><!-- /bottom-row -->
+
+  <!-- ================================================================
+       FOOTER: Security Note (Left) & Page Counter (Right)
+       ================================================================ -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="footer-shield-icon">🔒</div>
+      <div class="footer-security-text">
+        <span class="sec-title">Security &amp; Privacy Note:</span> {{ tool.security_note }}<br>
+        <span class="sec-caution">Use AI tools responsibly. Do not share confidential or sensitive HAL information.</span>
+      </div>
+    </div>
+    <div class="footer-right">Page {{ '%02d' % loop.index }} of {{ tools | length }}</div>
+  </div>
+
+</div><!-- /page -->
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,218 @@
+.generate-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+/* =====================================================================
+   MAIN GENERATE BUTTON
+   ===================================================================== */
+.generate-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 34px;
+  border-radius: var(--radius-lg);
+  font-size: 15.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #0c2340 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4), 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e3a8a 100%);
+}
+
+.generate-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.generate-btn.loading {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+  cursor: not-allowed;
+}
+
+.generate-btn.errored {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 4px 18px rgba(185, 28, 28, 0.4);
+}
+
+.btn-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Subtle gloss shine */
+.btn-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-20deg);
+  transition: 0.75s;
+}
+
+.generate-btn:hover .btn-glow {
+  left: 200%;
+}
+
+/* =====================================================================
+   STEP PROGRESS TRACKER
+   ===================================================================== */
+.step-track-container {
+  width: 100%;
+  max-width: 680px;
+  background: rgba(7, 21, 39, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+.step-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  text-align: center;
+}
+
+.step-node {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.step-item.active .step-node {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+}
+
+.step-item.done .step-node {
+  background: #059669;
+  border-color: #34d399;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+}
+
+.node-radar {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #38bdf8;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.node-check {
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.step-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-top: 8px;
+  line-height: 1.2;
+  transition: color 0.3s ease;
+}
+
+.step-item.active .step-label {
+  color: #38bdf8;
+}
+
+.step-item.done .step-label {
+  color: #a7f3d0;
+}
+
+/* Connecting lines between nodes */
+.step-connector {
+  position: absolute;
+  top: 17px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #334155;
+  z-index: 1;
+  transition: background 0.3s ease;
+}
+
+.step-connector.done {
+  background: #059669;
+}
+
+/* =====================================================================
+   ERROR CALLOUT
+   ===================================================================== */
+.generate-error-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(185, 28, 28, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  color: #fecaca;
+  font-size: 13px;
+  max-width: 600px;
+  width: 100%;
+  text-align: left;
+}
+
+.error-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}

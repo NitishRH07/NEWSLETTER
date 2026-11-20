@@ -1,0 +1,48 @@
+# Environment variables and secrets
+config/.env
+.env
+*.env.local
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+.eslintcache
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+newsletter.db
+
+# Output artifacts & logs (large generated PDFs, docx, logs)
+generated_newsletters/*.pdf
+generated_newsletters/*.docx
+generated_newsletters/*.html
+generated_newsletters/*.json
+generated_newsletters/logs/
+!generated_newsletters/SAMPLE_HAL_AI_Tools_Weekly.html
+!generated_newsletters/SAMPLE_HAL_AI_Tools_Weekly.pdf
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

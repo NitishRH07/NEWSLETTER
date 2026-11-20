@@ -1,0 +1,264 @@
+/* =====================================================================
+   HISTORY PAGE — MODERN ARCHIVE STYLES
+   ===================================================================== */
+
+.history-container {
+  padding: 28px 36px 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.history-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.history-heading {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--navy-800);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.history-subheading {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Metrics Row */
+.history-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-box {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+.metric-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.metric-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--navy-800);
+  letter-spacing: -0.02em;
+}
+
+.metric-sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Table Card */
+.history-table-card {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.table-header-bar {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--navy-800);
+}
+
+.table-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.history-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.modern-table th {
+  background: #f8fafc;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modern-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  color: var(--text-primary);
+}
+
+.modern-table tr:hover td {
+  background: #f8fafc;
+}
+
+.issue-badge-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy-800);
+  background: var(--navy-50);
+  border: 1px solid var(--navy-100);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.week-primary {
+  font-weight: 700;
+  color: var(--navy-800);
+}
+
+.date-secondary {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.tools-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tool-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.row-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.pill-action-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+}
+
+.pill-action-btn.view:hover {
+  background: #f0f9ff;
+  border-color: #7dd3fc;
+  color: #0284c7;
+}
+
+.pill-action-btn.pdf:hover {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #059669;
+}
+
+.pill-action-btn.json:hover {
+  background: #faf5ff;
+  border-color: #d8b4fe;
+  color: #7e22ce;
+}
+
+/* Pagination */
+.table-footer-pagination {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+}
+
+.page-counter-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Empty & Loading states */
+.history-loading-card, .history-empty-card, .history-error-card {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--navy-800);
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}

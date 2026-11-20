@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: hal-ai-newsletter-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: HAL_NEWSLETTER_TITLE
+        value: "HAL AI Tools Weekly"
+      - key: NEWSLETTER_OUTPUT_DIR
+        value: "generated_newsletters"
