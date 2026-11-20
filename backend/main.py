@@ -38,10 +38,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
+# Routers — mounted with both /api prefix and root prefix for seamless Vercel/Render compatibility
 app.include_router(newsletter.router, prefix="/api/newsletter")
 app.include_router(settings.router, prefix="/api/settings")
 app.include_router(history.router, prefix="/api/history")
+
+app.include_router(newsletter.router, prefix="/newsletter")
+app.include_router(settings.router, prefix="/settings")
+app.include_router(history.router, prefix="/history")
 
 
 @app.on_event("startup")
@@ -53,6 +57,7 @@ async def startup():
     Path("generated_newsletters/logs").mkdir(parents=True, exist_ok=True)
 
 
+@app.get("/")
 @app.get("/health")
 async def health():
     return {"status": "ok", "app": "HAL Newsletter API"}
