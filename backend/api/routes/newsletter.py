@@ -16,6 +16,7 @@ from backend.services.research_service import ResearchService
 from backend.services.content_service import ContentService
 from backend.content_generation.content_generator import ContentGenerator
 from backend.pdf_generator.pdf_creator import PDFCreator
+from backend.template_engine.html_renderer import HTMLRenderer
 from backend.services.word_service import WordCreator
 from backend.config.settings import settings
 
@@ -251,7 +252,9 @@ async def preview_newsletter(newsletter_id: int):
     """Return the rendered HTML for browser preview."""
     async with get_session() as session:
         result = await session.execute(
-            select(Newsletter).where(Newsletter.id == newsletter_id)
+            select(Newsletter)
+            .options(selectinload(Newsletter.tools))
+            .where(Newsletter.id == newsletter_id)
         )
         newsletter = result.scalar_one_or_none()
         if not newsletter:
@@ -261,6 +264,19 @@ async def preview_newsletter(newsletter_id: int):
         html_path = newsletter.pdf_path.replace(".pdf", ".html")
         if Path(html_path).exists():
             return Path(html_path).read_text(encoding="utf-8")
+
+    # On-demand render from database tools
+    tools_data = [t.to_dict()["content"] for t in newsletter.tools]
+    if tools_data:
+        renderer = HTMLRenderer()
+        issue_info = {
+            "issue_number": newsletter.issue_number,
+            "week_label": newsletter.week_label,
+            "pub_date": newsletter.pub_date,
+            "title": settings.hal_newsletter_title,
+            "pages_per_tool": getattr(newsletter, "pages_per_tool", 1) or 1,
+        }
+        return renderer.render_newsletter(tools_data, issue_info, template_name=newsletter.template_name or "modern")
 
     raise HTTPException(status_code=404, detail="Preview HTML not available.")
 
@@ -370,23 +386,55 @@ async def regenerate_tool(newsletter_id: int, tool_num: int):
 
 @router.get("/{newsletter_id}/download")
 async def download_newsletter(newsletter_id: int):
-    """Stream the PDF file as a download."""
+    """Stream the PDF file as a download (regenerates on demand if file was purged)."""
     async with get_session() as session:
         result = await session.execute(
-            select(Newsletter).where(Newsletter.id == newsletter_id)
+            select(Newsletter)
+            .options(selectinload(Newsletter.tools))
+            .where(Newsletter.id == newsletter_id)
         )
         newsletter = result.scalar_one_or_none()
         if not newsletter:
             raise HTTPException(status_code=404, detail="Newsletter not found.")
 
-    if not newsletter.pdf_path or not Path(newsletter.pdf_path).exists():
-        raise HTTPException(status_code=404, detail="PDF file not found on disk.")
+    output_dir = Path(settings.newsletter_output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    pdf_path = newsletter.pdf_path
 
-    filename = Path(newsletter.pdf_path).name
+    # If pdf_path is missing or does not exist on disk, render on the fly from DB tools
+    if not pdf_path or not Path(pdf_path).exists():
+        safe_date = (newsletter.pub_date or "latest").replace(" ", "_")
+        pdf_path = str(output_dir / f"HAL_AI_Tools_Weekly_Issue{newsletter.issue_number:02d}_{safe_date}.pdf")
+        
+        if not Path(pdf_path).exists():
+            tools_data = [t.to_dict()["content"] for t in newsletter.tools]
+            if not tools_data and newsletter.json_path and Path(newsletter.json_path).exists():
+                try:
+                    data = json.loads(Path(newsletter.json_path).read_text(encoding="utf-8"))
+                    tools_data = data.get("tools", [])
+                except Exception:
+                    tools_data = []
+
+            if not tools_data:
+                raise HTTPException(status_code=404, detail="Newsletter content could not be found for PDF generation.")
+
+            issue_info = {
+                "issue_number": newsletter.issue_number,
+                "week_label": newsletter.week_label,
+                "pub_date": newsletter.pub_date,
+                "title": settings.hal_newsletter_title,
+                "pages_per_tool": getattr(newsletter, "pages_per_tool", 1) or 1,
+            }
+            pdf_creator = PDFCreator()
+            tpl = getattr(newsletter, "template_name", "modern") or "modern"
+            await pdf_creator.generate_pdf(tools_data, issue_info, pdf_path, template_name=tpl)
+
+    filename = Path(pdf_path).name
     return FileResponse(
-        path=newsletter.pdf_path,
+        path=pdf_path,
         media_type="application/pdf",
         filename=filename,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 
@@ -403,35 +451,31 @@ async def download_newsletter_word(newsletter_id: int):
         if not newsletter:
             raise HTTPException(status_code=404, detail="Newsletter not found.")
 
-    if not newsletter.pdf_path:
-        raise HTTPException(status_code=404, detail="Newsletter file reference not found.")
+    output_dir = Path(settings.newsletter_output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    safe_date = (newsletter.pub_date or "latest").replace(" ", "_")
+    docx_path = str(output_dir / f"HAL_AI_Tools_Weekly_Issue{newsletter.issue_number:02d}_{safe_date}.docx")
 
-    docx_path = newsletter.pdf_path.replace(".pdf", ".docx")
-    
     # If docx does not already exist on disk, generate it on demand from JSON or DB tools
     if not Path(docx_path).exists():
-        tools_data = []
+        tools_data = [t.to_dict()["content"] for t in newsletter.tools]
+        if not tools_data and newsletter.json_path and Path(newsletter.json_path).exists():
+            try:
+                data = json.loads(Path(newsletter.json_path).read_text(encoding="utf-8"))
+                tools_data = data.get("tools", [])
+            except Exception:
+                tools_data = []
+
+        if not tools_data:
+            raise HTTPException(status_code=404, detail="Newsletter content could not be retrieved for Word export.")
+
         issue_info = {
             "issue_number": newsletter.issue_number,
             "week_label": newsletter.week_label,
             "pub_date": newsletter.pub_date,
             "title": settings.hal_newsletter_title,
+            "pages_per_tool": getattr(newsletter, "pages_per_tool", 1) or 1,
         }
-        
-        # Check if json_path exists
-        if newsletter.json_path and Path(newsletter.json_path).exists():
-            try:
-                data = json.loads(Path(newsletter.json_path).read_text(encoding="utf-8"))
-                tools_data = data.get("tools", [])
-                issue_info = data.get("issue_info", issue_info)
-            except Exception:
-                tools_data = []
-
-        if not tools_data and newsletter.tools:
-            tools_data = [t.to_dict()["content"] for t in newsletter.tools]
-
-        if not tools_data:
-            raise HTTPException(status_code=404, detail="Newsletter content could not be retrieved for Word export.")
 
         wc = WordCreator()
         try:
@@ -445,6 +489,7 @@ async def download_newsletter_word(newsletter_id: int):
         path=docx_path,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         filename=filename,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

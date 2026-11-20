@@ -56,7 +56,6 @@ function Layout({ children }) {
             <div className="status-indicator-dot" />
             <div className="status-text-block">
               <div className="status-label">Engine Ready</div>
-              <div className="status-sub">Gemini 3.1 Flash Active</div>
             </div>
           </div>
           <div className="sidebar-org-text">
