@@ -28,25 +28,21 @@ def _normalize_db_url_and_args(raw_url: str) -> tuple[str, dict]:
     elif url.startswith("postgresql://") and not url.startswith("postgresql+"):
         url = "postgresql+asyncpg://" + url[len("postgresql://"):]
 
-    # asyncpg expects connect_args={'ssl': 'require'}, NOT query parameter sslmode='require'
-    if "sslmode=" in url or "neon.tech" in url:
+    if "postgresql" in url or "postgres" in url:
         parsed = urlparse(url)
-        query_params = parse_qs(parsed.query)
-        # Pop sslmode so asyncpg doesn't reject it as unexpected kwarg
-        ssl_val = query_params.pop("sslmode", ["require"])[0]
-        new_query = urlencode(query_params, doseq=True)
+        # Strip all query parameters (e.g. sslmode, channel_binding) as asyncpg does not accept them via URL query
         url = urlunparse((
             parsed.scheme,
             parsed.netloc,
             parsed.path,
-            parsed.params,
-            new_query,
-            parsed.fragment
+            "",
+            "",
+            ""
         ))
-        if ssl_val in ("require", "verify-ca", "verify-full") or "neon.tech" in url:
-            connect_args["ssl"] = "require"
+        # Enforce secure SSL for cloud PostgreSQL (like Neon)
+        connect_args["ssl"] = "require"
 
-    if "sqlite" in url:
+    elif "sqlite" in url:
         connect_args["check_same_thread"] = False
 
     return url, connect_args
