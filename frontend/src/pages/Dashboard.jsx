@@ -117,7 +117,8 @@ export default function Dashboard() {
       : 'Direct Auto-Discovery'
 
     const totalPagesTarget = toolCount * pagesPerTool
-    addLog(`Initiating pipeline: ${toolCount} tool(s) × ${pagesPerTool} pg = ${totalPagesTarget}-page PDF, ${templateToUse === 'modern' ? 'Template 2 (Modern)' : 'Template 1 (Classic)'}, ${modeLabel}…`, 'info')
+    const tplName = templateToUse === 'gn3_hal' ? 'Template 3 (GN3-HAL)' : templateToUse === 'modern' ? 'Template 2 (Modern)' : 'Template 1 (Classic)'
+    addLog(`Initiating pipeline: ${toolCount} tool(s) × ${pagesPerTool} pg = ${totalPagesTarget}-page PDF, ${tplName}, ${modeLabel}…`, 'info')
 
     try {
       const res = await newsletterApi.generate({
@@ -300,6 +301,35 @@ export default function Dashboard() {
                   <div className="box-heading">Modern Infographic Edition</div>
                   <div className="box-desc">
                     Modular 3-column grid, tool-specific timeline, Feature Snapshot pipeline, and HAL workplace applications.
+                  </div>
+                </div>
+              </div>
+
+              {/* Option 3: GN3-HAL (Employee Edition) */}
+              <div
+                className={`template-box ${selectedTemplate === 'gn3_hal' ? 'is-selected' : ''}`}
+                onClick={() => setSelectedTemplate('gn3_hal')}
+              >
+                <div className="box-top-tag">
+                  <span className="box-pill" style={{ background: '#059669', color: '#fff' }}>TEMPLATE 3</span>
+                  {selectedTemplate === 'gn3_hal' ? (
+                    <span className="check-pill" style={{ background: '#059669', color: '#fff' }}>✓ SELECTED</span>
+                  ) : (
+                    <span className="hint-pill">Select</span>
+                  )}
+                </div>
+                <div className="box-thumb" style={{ background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ textAlign: 'center', padding: '10px 4px' }}>
+                    <div style={{ fontSize: '28px', marginBottom: '4px' }}>💡✨</div>
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: '#065f46', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      GN3-HAL Employee Edition
+                    </span>
+                  </div>
+                </div>
+                <div className="box-body">
+                  <div className="box-heading" style={{ color: '#059669' }}>GN3-HAL (Employee Edition)</div>
+                  <div className="box-desc">
+                    Tailored for non-technical staff: everyday analogies, Before &amp; After stories, visual 3-step flows, zero jargon, and 60-second tryouts.
                   </div>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-"""Gemini API client wrapper."""
+"""Gemini API client wrapper with multi-model fallback cascade."""
 
 import asyncio
 import logging
@@ -7,19 +7,23 @@ from backend.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
-# Preferred models in priority order (flash-lite models have high free-tier quotas and low latency)
+# Preferred models in priority order for robust multi-model fallback cascade
 MODELS_TO_TRY = [
+    "gemini-2.5-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
     "gemini-3.1-flash-lite",
     "gemini-3.1-flash-lite-preview",
     "gemini-3-flash-preview",
-    "gemini-3.8-flash",
-    "gemini-3.7-flash",
+    "gemini-1.5-pro",
     "gemini-flash-latest",
 ]
 
 
 class GeminiClient:
-    """Thin async wrapper around the google-generativeai SDK."""
+    """Thin async wrapper around the google-generativeai SDK with automatic model cascade."""
 
     def __init__(self):
         self.model = None
@@ -43,20 +47,33 @@ class GeminiClient:
                 except Exception:
                     continue
             if self.model is None:
-                self.model = genai.GenerativeModel("gemini-3.1-flash-lite")
-                self._current_model_name = "gemini-3.1-flash-lite"
+                self.model = genai.GenerativeModel("gemini-1.5-flash")
+                self._current_model_name = "gemini-1.5-flash"
 
     async def generate(self, prompt: str) -> str:
-        """Generate text from `prompt` using Gemini."""
+        """
+        Generate text from `prompt` using Gemini with automatic multi-model failover.
+        Cycles through MODELS_TO_TRY on rate limits, quota issues, or API errors.
+        """
         self._ensure_configured()
         loop = asyncio.get_event_loop()
 
-        for m_name in [self._current_model_name] + [m for m in MODELS_TO_TRY if m != self._current_model_name]:
+        # Build prioritized candidate list starting with current model
+        candidates = []
+        if self._current_model_name:
+            candidates.append(self._current_model_name)
+        for m in MODELS_TO_TRY:
+            if m not in candidates:
+                candidates.append(m)
+
+        last_error = None
+        for m_name in candidates:
             try:
+                logger.info("Attempting content generation with Gemini model: %s", m_name)
                 model = genai.GenerativeModel(m_name)
                 response = await loop.run_in_executor(
                     None,
-                    lambda: model.generate_content(prompt, request_options={"timeout": 30})
+                    lambda: model.generate_content(prompt, request_options={"timeout": 35})
                 )
                 if response and response.text:
                     self.model = model
@@ -64,7 +81,8 @@ class GeminiClient:
                     logger.info("Successfully generated content with Gemini model: %s", m_name)
                     return response.text
             except Exception as exc:
-                logger.warning("Gemini model %s failed: %s — trying next fallback", m_name, exc)
+                last_error = exc
+                logger.warning("Gemini model %s encountered error: %s — cascading to next model", m_name, exc)
                 continue
 
-        raise RuntimeError("All Gemini models failed to generate content.")
+        raise RuntimeError(f"All Gemini models in fallback cascade failed. Last error: {last_error}")

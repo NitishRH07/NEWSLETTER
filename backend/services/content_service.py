@@ -10,6 +10,7 @@ from sqlalchemy import select
 from backend.content_generation.content_generator import ContentGenerator
 from backend.pdf_generator.pdf_creator import PDFCreator
 from backend.services.word_service import WordCreator
+from backend.services.openrouter_service import OpenRouterService
 from backend.database.db_manager import get_session
 from backend.database.models import Newsletter, ToolRecord, PublishedTool, NewsletterStatus
 from backend.config.settings import settings
@@ -24,6 +25,7 @@ class ContentService:
         self.generator = ContentGenerator()
         self.pdf_creator = PDFCreator()
         self.word_creator = WordCreator()
+        self.openrouter_service = OpenRouterService()
 
     async def get_next_issue_number(self) -> int:
         """Return the next sequential issue number."""
@@ -76,12 +78,22 @@ class ContentService:
             "pages_per_tool": pages_per_tool,
         }
 
+        # Retrieve OpenRouter weekly model rankings for the pulse leaderboard
+        try:
+            issue_info["openrouter_rankings"] = await self.openrouter_service.get_weekly_rankings()
+        except Exception as or_err:
+            logger.warning("Could not fetch OpenRouter rankings: %s", or_err)
+
         # 1. Generate content for each tool
         tools_content = []
         for idx, tool in enumerate(tools_research, start=1):
-            logger.info("Generating content for tool %d: %s", idx, tool.get("name"))
+            logger.info("Generating content for tool %d: %s (template: %s)", idx, tool.get("name"), template_name)
             try:
-                content = await self.generator.generate_tool_content(tool, custom_focus=custom_focus)
+                content = await self.generator.generate_tool_content(
+                    tool,
+                    custom_focus=custom_focus,
+                    template_name=template_name,
+                )
             except Exception as exc:
                 logger.warning("Gemini generation failed for %r: %s — using structured fallback", tool.get("name"), exc)
                 content = self.generator._validate_and_patch({
@@ -102,7 +114,7 @@ class ContentService:
                     "pricing_tier": tool.get("pricing_tier", "Freemium"),
                     "pricing_details": tool.get("pricing_details", "Visit website for current pricing details."),
                     "security_note": "⚠ Do not upload classified, proprietary, or project-sensitive company data to external AI platforms. — HAL IT Security"
-                }, tool)
+                }, tool, is_gn3_hal=(template_name == "gn3_hal"))
             content["tool_number"] = idx
             tools_content.append(content)
 

@@ -172,3 +172,181 @@ Your goal is to explain the AI tool below in CLEAR, PLAIN ENGLISH with HIGH INFO
 }}
 Return ONLY the raw JSON object. No markdown backticks, no preamble.
 """)
+
+
+# ==============================================================================
+# GN3-HAL: DEDICATED PROMPT FOR NON-TECHNICAL EMPLOYEES & WORKSHOP STAFF
+# ==============================================================================
+GN3_HAL_CONTENT_PROMPT = PromptTemplate("""
+You are an internal workplace educator and communications writer for Hindustan Aeronautics Limited (HAL).
+You are writing for the "GN3-HAL Employee Edition" of the AI Tools Weekly Newsletter.
+
+## TARGET AUDIENCE (CRITICAL)
+Your readers are NON-TECHNICAL employees across HAL:
+- Office administrative staff, secretaries, and HR coordinators
+- Shop-floor supervisors, storekeepers, inventory managers, and tool crib operators
+- Equipment maintenance technicians and quality inspectors
+- Junior staff seeing modern AI productivity tools for the very first time!
+
+## STRICT EDITORIAL PRINCIPLES FOR GN3-HAL
+1. ZERO TECHNICAL JARGON:
+   - STRICTLY FORBIDDEN: Do NOT use words like "AST", "vector database", "API endpoint", "tokens", "inference", "regex", "CLI", "latency", "repository", "embeddings", or "SDK".
+   - Use plain, warm, conversational office language that anyone can grasp in 10 seconds.
+2. COMPULSORY EVERYDAY ANALOGY:
+   - Provide an instant, relatable mental model: e.g. "Think of this tool like your smartphone's autocorrect, but for entire office memos and spreadsheets", or "Think of it like a smart Ctrl+F that reads a 50-page equipment booklet and answers your questions in plain words."
+3. BEFORE-AND-AFTER WORKPLACE STORY:
+   - Contrast the real workplace pain (Before: hours of manual copy-pasting, comparing paper printouts) with the immediate relief (After: 2-minute instant summary or neat table).
+4. SIMPLE 3-STEP FLOW:
+   - Step 1 (Input): Drop in messy notes, vendor invoices, or user manuals.
+   - Step 2 (Action): Type your question in everyday words (no coding!).
+   - Step 3 (Result): Get a tidy checklist, summary, or spreadsheet ready for work.
+5. "60-SECOND QUICK TRYOUT" PROMPT:
+   - A zero-intimidation, practical prompt an employee can copy, paste into the tool, and test right away without any training.
+6. ZERO REDUNDANCY BETWEEN PAGE 1 AND PAGE 2:
+   - Page 1 covers: Everyday Analogy, What It Does (Plain English), 5 Everyday Benefits, Before & After Story, 3-Step Visual Flow, Where It Helps Across 3 Departments, and 60-Second Tryout.
+   - Page 2 covers: Practical Workplace Case Study, Zero-IT Quickstart Guide (3 steps to get started), Employee Data Safety Shield (Green Light vs Red Light), and Everyday Employee FAQ (answers to common anxieties like job security, data privacy, and lack of coding skills).
+7. DEFENSE CLASSIFICATION RESTRICTION:
+   - NEVER mention defense aircraft, helicopter, or missile programs (DO NOT mention LCA Tejas, Su-30MKI, Dhruv, Prachand, etc.).
+   - Focus on safe, unclassified office, logistics, inspection, and administrative productivity.
+
+## Tool Details
+- Name: {tool_name}
+- Category: {category}
+- Website: {website}
+- Research Data:
+{research_data}
+{custom_focus_section}
+
+## Required JSON Schema for GN3-HAL
+{{
+  "name": "{tool_name}",
+  "category": "<e.g. Office Writing & Memos | Smart Spreadsheets & Lists | Document Reader & Helper>",
+  "everyday_analogy": "<1-2 crisp sentences comparing the tool to a common everyday experience e.g. 'Think of it like your phone's autocomplete, but for complete office letters and reports.'>",
+  "overview": "<2-3 sentence friendly, jargon-free summary explaining what the tool is and how it saves employees time and headaches>",
+  "what_it_does": "<3-4 simple sentences describing the everyday task this tool takes off an employee's desk>",
+  "key_features": [
+    "<Benefit 1 Title in plain words>: <Clear 1-sentence everyday benefit>",
+    "<Benefit 2 Title in plain words>: <Clear 1-sentence everyday benefit>",
+    "<Benefit 3 Title in plain words>: <Clear 1-sentence everyday benefit>",
+    "<Benefit 4 Title in plain words>: <Clear 1-sentence everyday benefit>",
+    "<Benefit 5 Title in plain words>: <Clear 1-sentence everyday benefit>"
+  ],
+  "before_and_after": {{
+    "pain_before": "<1-2 sentences on the manual, frustrating, time-consuming way of doing this task>",
+    "relief_after": "<1-2 sentences on how fast, calm, and simple the task becomes with this tool>"
+  }},
+  "how_it_works": "<2 simple sentences explaining the journey from opening the tool to getting the result>",
+  "how_it_works_steps": [
+    {{
+      "step": "01",
+      "title": "<e.g. Provide Your Material>",
+      "desc": "<Drop in your document, paste notes, or open your worksheet in plain English.>"
+    }},
+    {{
+      "step": "02",
+      "title": "<e.g. Ask in Plain Words>",
+      "desc": "<Type what you need just like asking a friendly colleague at the next desk.>"
+    }},
+    {{
+      "step": "03",
+      "title": "<e.g. Review & Use Result>",
+      "desc": "<Get a neat, organized summary or table ready for your immediate daily work.>"
+    }}
+  ],
+  "where_it_helps": [
+    {{
+      "icon": "📋",
+      "title": "Office & Administration",
+      "desc": "<1-2 sentence real office scenario e.g. drafting clear memos and meeting notes in minutes>"
+    }},
+    {{
+      "icon": "📦",
+      "title": "Stores & Procurement",
+      "desc": "<1-2 sentence real scenario e.g. comparing supplier quotes and tracking delivery items>"
+    }},
+    {{
+      "icon": "🔧",
+      "title": "Maintenance & Inspection",
+      "desc": "<1-2 sentence real scenario e.g. turning lengthy instruction booklets into quick step-by-step checklists>"
+    }}
+  ],
+  "feature_snapshot": {{
+    "input_badge": "STEP 1: INPUT",
+    "input_icon": "📄",
+    "input_title": "Messy Notes or Document",
+    "input_desc": "<e.g. Long report, vendor PDF, or rough notes>",
+    "ai_step_badge": "STEP 2: SIMPLE AI",
+    "ai_step_icon": "✨",
+    "ai_step_title": "Plain English Request",
+    "ai_step_desc": "<e.g. 'Summarize top 3 points for my meeting'>",
+    "output_badge": "STEP 3: READY OUTPUT",
+    "output_icon": "✅",
+    "output_title": "Tidy Deliverable",
+    "output_desc": "<e.g. Ready checklist or clean table>",
+    "key_advantage": "<1 punchy encouraging sentence e.g. Saves up to 2 hours of manual typing on busy workdays.>"
+  }},
+  "impact_metrics": {{
+    "time_saved": "<e.g. ~3 to 5 hours saved every week>",
+    "key_metric": "<e.g. Finish repetitive drafts 70% faster>",
+    "target_departments": "<e.g. Administration, Stores, Accounts, Maintenance, Engineering>",
+    "learning_curve": "Zero (No coding required, works like a standard search box)"
+  }},
+  "practical_applications": "<2-3 sentence overview of simple everyday tasks this tool solves for HAL staff>",
+  "hal_use_case": "<2-3 sentence safe workplace scenario for HAL employees (NO defense program names)>",
+  "hal_example_workflow": "<1 sentence simple task example e.g. Converting a 30-page tool manual into a 1-page daily inspection checklist>",
+  "adaptive_workflow": {{
+    "label": "60-SECOND QUICK TRYOUT (COPY & PASTE TODAY)",
+    "standard_title": "EVERYDAY 60-SECOND TRYOUT PROMPT",
+    "standard_body": "<A simple, relatable prompt the employee can paste directly into the tool right now>",
+    "advanced_title": "NEXT-LEVEL OFFICE SHORTCUT",
+    "advanced_body": "<A slightly richer prompt that formats outputs into a comparison table or structured memo>"
+  }},
+  "page_2_dossier": {{
+    "integration_architecture": {{
+      "environment": "<Where you can open it: standard web browser (Chrome, Edge), Excel, or desktop>",
+      "computation_model": "<Simple explanation: runs safely in standard web browser or desktop without special hardware>",
+      "file_formats": "<Common files: Word (.docx), Excel (.xlsx), PDF, text files>",
+      "setup_instructions": "<1-2 friendly sentences: Just visit the website, sign in with your approved company login, and start typing.>"
+    }},
+    "case_study": {{
+      "title": "<Relatable workplace story title e.g. Organizing 50 Vendor Quotations in 5 Minutes>",
+      "context": "<The everyday workplace headache faced by the team>",
+      "input_sample": "<The messy or lengthy material they started with>",
+      "ai_transformation": "<How the tool sorted and organized the information in plain words>",
+      "final_deliverable": "<The clean resulting document or table that saved the day>"
+    }},
+    "governance_matrix": {{
+      "permitted_data": [
+        "Public equipment manuals, catalog brochures, and published standards",
+        "Routine internal meeting agendas and non-sensitive training notes",
+        "General office forms, standard templates, and unclassified schedules"
+      ],
+      "prohibited_data": [
+        "Classified defense project files, aircraft parameters, or secret military blueprints",
+        "Confidential commercial contract costs, private employee salaries, or passwords",
+        "Restricted technical drawings or confidential proprietary manufacturing recipes"
+      ]
+    }},
+    "enterprise_faq": [
+      {{
+        "q": "Do I need any programming or computer science skills to use this?",
+        "a": "Not at all! If you know how to type a message or search on Google, you can use this tool immediately."
+      }},
+      {{
+        "q": "Will this tool replace my job at HAL?",
+        "a": "No. AI is simply a smart helper—like a calculator for words and tables. You remain the expert in charge of reviewing and approving all work."
+      }},
+      {{
+        "q": "Is it safe to type company information into this tool?",
+        "a": "Only use approved tools and NEVER enter classified, sensitive defense, or proprietary data. Follow the green safety shield guidelines."
+      }}
+    ]
+  }},
+  "website": "{website}",
+  "website_display": "<clean domain e.g. julius.ai>",
+  "pricing_tier": "<Free | Freemium | Paid | Enterprise>",
+  "pricing_details": "<Simple pricing explanation e.g. 'Free to use for basic daily tasks'>",
+  "security_note": "⚠ Always follow HAL IT Security rules. Never enter classified, defense-related, or private company data into external AI tools. — HAL IT Security"
+}}
+Return ONLY the raw JSON object. No markdown backticks, no preamble.
+""")

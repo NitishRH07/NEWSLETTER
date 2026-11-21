@@ -29,7 +29,12 @@ class HTMLRenderer:
         Returns:
             Complete HTML string ready for PDF conversion.
         """
-        filename = "newsletter_modern.html" if template_name == "modern" else "newsletter_page.html"
+        if template_name == "gn3_hal":
+            filename = "newsletter_gn3_hal.html"
+        elif template_name == "modern":
+            filename = "newsletter_modern.html"
+        else:
+            filename = "newsletter_page.html"
         template = self.env.get_template(filename)
         render_ctx = {
             "tools": tools,

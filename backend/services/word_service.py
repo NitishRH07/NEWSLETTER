@@ -161,11 +161,44 @@ class WordCreator:
             if overview_text:
                 op = doc.add_paragraph()
                 op.paragraph_format.space_before = Pt(8)
-                op.paragraph_format.space_after = Pt(8)
+                op.paragraph_format.space_after = Pt(4)
                 orun = op.add_run(f"Executive Summary: {overview_text}")
                 orun.font.size = Pt(10)
                 orun.italic = True
                 orun.font.color.rgb = CHARCOAL
+
+            # Everyday Analogy (if present in GN3-HAL)
+            analogy = tool.get("everyday_analogy", "")
+            if analogy:
+                ap = doc.add_paragraph()
+                ap.paragraph_format.space_before = Pt(2)
+                ap.paragraph_format.space_after = Pt(6)
+                ar_title = ap.add_run("Everyday Analogy: ")
+                ar_title.bold = True
+                ar_title.font.size = Pt(9.5)
+                ar_title.font.color.rgb = SAFFRON
+                ar_body = ap.add_run(analogy)
+                ar_body.font.size = Pt(9.5)
+                ar_body.italic = True
+
+            # Before & After Comparison (if present in GN3-HAL)
+            bna = tool.get("before_and_after", {})
+            if isinstance(bna, dict) and (bna.get("pain_before") or bna.get("relief_after")):
+                bp = doc.add_paragraph()
+                bp.paragraph_format.space_before = Pt(2)
+                bp.paragraph_format.space_after = Pt(6)
+                bp_title = bp.add_run("Workplace Transformation: ")
+                bp_title.bold = True
+                bp_title.font.size = Pt(9.5)
+                bp_title.font.color.rgb = NAVY
+                if bna.get("pain_before"):
+                    b_pain = bp.add_run(f"\n• Before AI (The Pain): {bna.get('pain_before')}")
+                    b_pain.font.size = Pt(9)
+                    b_pain.font.color.rgb = RGBColor(180, 40, 40)
+                if bna.get("relief_after"):
+                    b_relief = bp.add_run(f"\n• With Tool (The Relief): {bna.get('relief_after')}")
+                    b_relief.font.size = Pt(9)
+                    b_relief.font.color.rgb = RGBColor(20, 120, 60)
 
             # Section: Top Capabilities
             h2_caps = doc.add_heading(level=2)
